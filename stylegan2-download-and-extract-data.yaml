@@ -17,10 +17,10 @@
 #
 # The user needs to create their own Gradient managed datasets for job outputs to replace the IDs this file contains:
 #
-# getCatImageDatabase -> "dsr5spfj2aqzlfg"
-# extractImages       -> "dsts5p5o8fe86j3"
+# getCatImageDatabase -> "dstlbm17s9ib1ld"
+# extractImages       -> "dstfq4pfrtz4fav"
 #
-# Last updated: May 19th 2021
+# Last updated: May 20th 2021
 
 # Our download and extract steps do not require a GPU, so we default to a C5 machine for all steps
 
@@ -42,7 +42,7 @@ jobs:
       catImageDatabase:
         type: dataset
         with:
-          id: "dsr5spfj2aqzlfg"
+          id: "dstlbm17s9ib1ld"
     uses: container@v1
     with:
       args:
@@ -92,15 +92,12 @@ jobs:
     inputs:
       repo:
         type: volume
-      catImageDatabase:
-        type: dataset
-        with:
-          id: "dsr5spfj2aqzlfg"
+      catImageDatabase: getCatImageDatabase.outputs.catImageDatabase
     outputs:
       extractedImages:
         type: dataset
         with:
-          id: "dsts5p5o8fe86j3"
+          id: "dstfq4pfrtz4fav"
     uses: container@v1
     with:
       args:
