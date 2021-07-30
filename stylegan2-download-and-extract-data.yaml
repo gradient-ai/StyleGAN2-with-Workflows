@@ -67,7 +67,7 @@ jobs:
   # The repo is public so the "username:" field, and "env:" field containing a Git password are not needed
 
   cloneStyleGAN2Repo:
-    inputs:
+    outputs:
       repo:
         type: volume
     uses: git-checkout@v1
@@ -90,8 +90,7 @@ jobs:
       - getCatImageDatabase
       - cloneStyleGAN2Repo
     inputs:
-      repo:
-        type: volume
+      repo: cloneStyleGAN2Repo.outputs.repo
       catImageDatabase: getCatImageDatabase.outputs.catImageDatabase
     outputs:
       extractedImages:
