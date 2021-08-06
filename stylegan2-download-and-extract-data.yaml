@@ -5,7 +5,7 @@
 #
 # See that URL for details on how to run the project.
 #
-# We assume the reader is familiar with the basics of workflows, and here wishes to use them for real projects.
+# We assume the reader is familiar with the basics of Workflows, and here wishes to use them for real projects.
 #
 # Workflow steps
 #
@@ -17,10 +17,10 @@
 #
 # The user needs to create their own Gradient managed datasets for job outputs to replace the IDs this file contains:
 #
-# getCatImageDatabase -> "dsrupsu443jcwrd" #"dstlbm17s9ib1ld"
-# extractImages       -> "dsrlrvzgqhtcy7o" #"dstfq4pfrtz4fav"
+# getCatImageDatabase -> "dsrupsu443jcwrd"
+# extractImages       -> "dsrlrvzgqhtcy7o"
 #
-# Last updated: Aug 05th 2021
+# Last updated: Aug 06th 2021
 
 # Our download and extract steps do not require a GPU, so we default to a C5 machine for all steps
 
@@ -58,8 +58,6 @@ jobs:
         ls "-aFlR" /outputs/catImageDatabase
       image: tensorflow/tensorflow:1.14.0-gpu-py3
 
-  #"dstlbm17s9ib1ld"
-
   # 2. Clone StyleGAN2 repo for script that extracts images from the LMDB-format database
 
   # The checkout results in an output volume
@@ -95,7 +93,7 @@ jobs:
       extractedImages:
         type: dataset
         with:
-          ref: "dsrlrvzgqhtcy7o" #"dstfq4pfrtz4fav"
+          ref: "dsrlrvzgqhtcy7o"
     uses: script@v1
     with:
       script: |-
@@ -144,7 +142,6 @@ jobs:
   #    LSUN's download script is for their scene categories dataset, not object categories
   #  - getCatImageDatabase uses TensorFlow image because alpine:latest doesn't have bash, and bash:5 doesn't have curl
   #  - /cat_workspace is acting like a temporary volume (copy files to it then rm), which could be done more formally
-  #  - The "|-" bash script form could also use the new script@v1 Gradient action
   #  - pip install --upgrade pip helps the opencv install go considerably faster
   #  - lmdb, python-lmdb, and opencv are required for dataset_tool.py create_lsun
   #  - The apt-get commands are needed for OpenCV on this container

@@ -21,12 +21,12 @@
 #
 # The user needs to create their own Gradient managed datasets for job outputs to replace the IDs this file contains:
 #
-# getPretrainedModel            -> "dst4o4ovffbl4pc" #"dsr4si1mzvjyls8"
-# evaluatePretrainedModel       -> "dsrc312ot0dejrz" #"dsr7sry8b6mkzmi"
-# generateImagesPretrainedModel -> "dst6xjunubzjvue" #"dsrtxabxfqmjbrw"
-# trainOurModel                 -> "dsr8vus0yf6i1hv" #"dsrso5rn4vtjlf4"
-# evaluateOurModel              -> "dstku0yhpuwn0l3" #"dstp3of0i4tr38s"
-# generateImagesOurModel        -> "dsr6qhqm56uf3cs" #"dstba8lqk9g2x7v"
+# getPretrainedModel            -> "dst4o4ovffbl4pc"
+# evaluatePretrainedModel       -> "dsrc312ot0dejrz"
+# generateImagesPretrainedModel -> "dst6xjunubzjvue"
+# trainOurModel                 -> "dsr8vus0yf6i1hv"
+# evaluateOurModel              -> "dstku0yhpuwn0l3"
+# generateImagesOurModel        -> "dsr6qhqm56uf3cs"
 #
 # The ID for the Gradient managed dataset should correspond to the ID and version output from running the first workflow
 # of the pair in this project (stylegan2-download-and-extract-data.yaml)
@@ -34,7 +34,7 @@
 # We create different datasets for the output from each job because jobs can run in parallel and if their outputs were
 # put into the same dataset it would create clashing versions.
 #
-# Last updated: Aug 05th 2021
+# Last updated: Aug 06th 2021
 
 jobs:
 
@@ -63,7 +63,7 @@ jobs:
       pretrainedNetwork:
         type: dataset
         with:
-          ref: "dst4o4ovffbl4pc" #"dsr4si1mzvjyls8"
+          ref: "dst4o4ovffbl4pc"
     uses: container@v1
     with:
       args:
@@ -76,7 +76,7 @@ jobs:
   # 3. Run evaluation on pretrained cat model
 
   # The temporary workaround using gzip/split/cat/gunzip is visible here and in steps 5-7
-  # dsts5p5o8fe86j3:6qstm0t refers to the specific dataset version that we want here
+  # dsrlrvzgqhtcy7o:... refers to the specific dataset version that we want here
   # (Also available are no version (latest), v1 (etc.), :latest, or :<dataset-tag>)
 
   evaluatePretrainedModel:
@@ -90,13 +90,13 @@ jobs:
       extractedImagesForTraining:
         type: dataset
         with:
-          ref: "dsrlrvzgqhtcy7o:..." #"dstfq4pfrtz4fav:17dcxcj"
+          ref: "dsrlrvzgqhtcy7o:..."
       pretrainedNetwork: getPretrainedModel.outputs.pretrainedNetwork
     outputs:
       evaluationPretrained:
         type: dataset
         with:
-          ref: "dsrc312ot0dejrz" #"dsr7sry8b6mkzmi"
+          ref: "dsrc312ot0dejrz"
     uses: script@v1
     with:
       script: |-
@@ -135,7 +135,7 @@ jobs:
       generatedCatsPretrained:
         type: dataset
         with:
-          ref: "dst6xjunubzjvue" #"dsrtxabxfqmjbrw"
+          ref: "dst6xjunubzjvue"
     uses: script@v1
     with:
       script: |-
@@ -154,7 +154,7 @@ jobs:
 
   # 5. Train our model on image subsample
 
-  # This could be extended to a larger image set by passing it in instead of dsts5p5o8fe86j3:6qstm0t
+  # This could be extended to a larger image set by passing it in instead of dsrlrvzgqhtcy7o:...
 
   trainOurModel:
     resources:
@@ -165,13 +165,13 @@ jobs:
       extractedImagesForTraining:
         type: dataset
         with:
-          ref: "dsrlrvzgqhtcy7o:..." #"dstfq4pfrtz4fav:17dcxcj"
+          ref: "dsrlrvzgqhtcy7o:..."
       repo: cloneStyleGAN2Repo.outputs.repo
     outputs:
       ourTrainedNetwork:
         type: dataset
         with:
-          ref: "dsr8vus0yf6i1hv" #"dsrso5rn4vtjlf4"
+          ref: "dsr8vus0yf6i1hv"
     uses: script@v1
     with:
       script: |-
@@ -215,13 +215,13 @@ jobs:
       extractedImagesForTraining:
         type: dataset
         with:
-          ref: "dsrlrvzgqhtcy7o:..." #"dstfq4pfrtz4fav:17dcxcj"
+          ref: "dsrlrvzgqhtcy7o:..."
       ourTrainedNetwork: trainOurModel.outputs.ourTrainedNetwork
     outputs:
       evaluationOurs:
         type: dataset
         with:
-          ref: "dstku0yhpuwn0l3" #"dstp3of0i4tr38s"
+          ref: "dstku0yhpuwn0l3"
     uses: script@v1
     with:
       script: |-
@@ -264,7 +264,7 @@ jobs:
       generatedCatsOurs:
         type: dataset
         with:
-          ref: "dsr6qhqm56uf3cs" #"dstba8lqk9g2x7v"
+          ref: "dsr6qhqm56uf3cs"
     uses: script@v1
     with:
       script: |-
