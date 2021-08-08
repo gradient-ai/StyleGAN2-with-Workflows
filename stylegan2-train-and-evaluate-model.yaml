@@ -7,7 +7,7 @@
 #
 # We assume the reader is familiar with the basics of workflows, and here wishes to use them for real projects.
 #
-# Workflow steps
+# Steps performed by the Workflow
 #
 # 1. Clone StyleGAN repo into managed storage provider dataset
 # 2. Get pretrained cat model
@@ -19,22 +19,24 @@
 #
 # Dataset IDs
 #
-# The user needs to create their own Gradient managed datasets for job outputs to replace the IDs this file contains:
+# The user needs to create their own Gradient managed dataset for job outputs, using the same names as here.
+# See the project GitHub documentation for details on how to do this.
 #
-# getPretrainedModel            -> "dst4o4ovffbl4pc"
-# evaluatePretrainedModel       -> "dsrc312ot0dejrz"
-# generateImagesPretrainedModel -> "dst6xjunubzjvue"
-# trainOurModel                 -> "dsr8vus0yf6i1hv"
-# evaluateOurModel              -> "dstku0yhpuwn0l3"
-# generateImagesOurModel        -> "dsr6qhqm56uf3cs"
+# Job name                         Gradient managed dataset name
+# getPretrainedModel            -> stylegan2-w2of2-pretrained-network
+# evaluatePretrainedModel       -> stylegan2-w2of2-evaluation-pretrained
+# generateImagesPretrainedModel -> stylegan2-w2of2-generated-cats-pretrained
+# trainOurModel                 -> stylegan2-w2of2-our-trained-network
+# evaluateOurModel              -> stylegan2-w2of2-evaluation-ours
+# generateImagesOurModel        -> stylegan2-w2of2-generated-cats-ours
 #
-# The ID for the Gradient managed dataset should correspond to the ID and version output from running the first workflow
-# of the pair in this project (stylegan2-download-and-extract-data.yaml)
+# The ID for the Gradient managed dataset should correspond to the ID output from running the first workflow of the pair
+# in this project (stylegan2-download-and-extract-data.yaml).
 #
 # We create different datasets for the output from each job because jobs can run in parallel and if their outputs were
 # put into the same dataset it would create clashing versions.
 #
-# Last updated: Aug 06th 2021
+# Last updated: Aug 08th 2021
 
 jobs:
 
@@ -63,7 +65,7 @@ jobs:
       pretrainedNetwork:
         type: dataset
         with:
-          ref: "dst4o4ovffbl4pc"
+          ref: stylegan2-w2of2-pretrained-network
     uses: container@v1
     with:
       args:
@@ -76,7 +78,8 @@ jobs:
   # 3. Run evaluation on pretrained cat model
 
   # The temporary workaround using gzip/split/cat/gunzip is visible here and in steps 5-7
-  # dsrlrvzgqhtcy7o:... refers to the specific dataset version that we want here
+  # The input extracted images dataset reference refers to the latest version from Workflow 1
+  # A particular version of the input extracted images can also be specified, via <dataset ID>:<dataset version>
   # (Also available are no version (latest), v1 (etc.), :latest, or :<dataset-tag>)
 
   evaluatePretrainedModel:
@@ -90,13 +93,13 @@ jobs:
       extractedImagesForTraining:
         type: dataset
         with:
-          ref: "dsrlrvzgqhtcy7o:..."
+          ref: stylegan2-w1of2-extracted-images
       pretrainedNetwork: getPretrainedModel.outputs.pretrainedNetwork
     outputs:
       evaluationPretrained:
         type: dataset
         with:
-          ref: "dsrc312ot0dejrz"
+          ref: stylegan2-w2of2-evaluation-pretrained
     uses: script@v1
     with:
       script: |-
@@ -135,7 +138,7 @@ jobs:
       generatedCatsPretrained:
         type: dataset
         with:
-          ref: "dst6xjunubzjvue"
+          ref: stylegan2-w2of2-generated-cats-pretrained
     uses: script@v1
     with:
       script: |-
@@ -154,7 +157,7 @@ jobs:
 
   # 5. Train our model on image subsample
 
-  # This could be extended to a larger image set by passing it in instead of dsrlrvzgqhtcy7o:...
+  # This could be extended to a larger image set by passing it in instead
 
   trainOurModel:
     resources:
@@ -165,13 +168,13 @@ jobs:
       extractedImagesForTraining:
         type: dataset
         with:
-          ref: "dsrlrvzgqhtcy7o:..."
+          ref: getPretrainedModel.outputs.pretrainedNetwork
       repo: cloneStyleGAN2Repo.outputs.repo
     outputs:
       ourTrainedNetwork:
         type: dataset
         with:
-          ref: "dsr8vus0yf6i1hv"
+          ref: stylegan2-w2of2-our-trained-network
     uses: script@v1
     with:
       script: |-
@@ -215,13 +218,13 @@ jobs:
       extractedImagesForTraining:
         type: dataset
         with:
-          ref: "dsrlrvzgqhtcy7o:..."
+          ref: getPretrainedModel.outputs.pretrainedNetwork
       ourTrainedNetwork: trainOurModel.outputs.ourTrainedNetwork
     outputs:
       evaluationOurs:
         type: dataset
         with:
-          ref: "dstku0yhpuwn0l3"
+          ref: stylegan2-w2of2-evaluation-ours
     uses: script@v1
     with:
       script: |-
@@ -264,7 +267,7 @@ jobs:
       generatedCatsOurs:
         type: dataset
         with:
-          ref: "dsr6qhqm56uf3cs"
+          ref: stylegan2-w2of2-generated-cats-ours
     uses: script@v1
     with:
       script: |-

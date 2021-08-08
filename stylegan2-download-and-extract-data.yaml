@@ -7,7 +7,7 @@
 #
 # We assume the reader is familiar with the basics of Workflows, and here wishes to use them for real projects.
 #
-# Workflow steps
+# Steps performed by the Workflow
 #
 # 1. Download the cat image database as a .zip file
 # 2. Clone StyleGAN2 repo for script that extracts images from the LMDB-format database
@@ -15,12 +15,14 @@
 #
 # Dataset IDs
 #
-# The user needs to create their own Gradient managed datasets for job outputs to replace the IDs this file contains:
+# The user needs to create their own Gradient managed dataset for job outputs, using the same names as here.
+# See the project GitHub documentation for details on how to do this.
 #
-# getCatImageDatabase -> "dsrupsu443jcwrd"
-# extractImages       -> "dsrlrvzgqhtcy7o"
+# Job name               Gradient managed dataset name
+# getCatImageDatabase -> stylegan-w1of2-cat-image-database
+# extractImages       -> stylegan-w1of2-extracted-images
 #
-# Last updated: Aug 06th 2021
+# Last updated: Aug 08th 2021
 
 # Our download and extract steps do not require a GPU, so we default to a C5 machine for all steps
 
@@ -42,7 +44,7 @@ jobs:
       catImageDatabase:
         type: dataset
         with:
-          ref: "dsrupsu443jcwrd"
+          ref: stylegan-w1of2-cat-image-database
     uses: script@v1
     with:
       script: |-
@@ -93,7 +95,7 @@ jobs:
       extractedImages:
         type: dataset
         with:
-          ref: "dsrlrvzgqhtcy7o"
+          ref: stylegan-w1of2-extracted-images
     uses: script@v1
     with:
       script: |-
