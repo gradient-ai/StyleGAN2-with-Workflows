@@ -1,3 +1,8 @@
+on:
+  github:
+    branches:
+      only: main
+
 # StyleGAN2 Workflow 2 of 2: Train and evaluate model
 #
 # This is the YAML file used to run the Gradient modeling Workflow for the sample project based on StyleGAN2 at
