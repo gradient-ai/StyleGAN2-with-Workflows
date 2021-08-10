@@ -170,10 +170,7 @@ jobs:
     needs:
       - cloneStyleGAN2Repo
     inputs:
-      extractedImagesForTraining:
-        type: dataset
-        with:
-          ref: getPretrainedModel.outputs.pretrainedNetwork
+      extractedImagesForTraining: getPretrainedModel.outputs.pretrainedNetwork
       repo: cloneStyleGAN2Repo.outputs.repo
     outputs:
       ourTrainedNetwork:
@@ -220,10 +217,7 @@ jobs:
       - trainOurModel
     inputs:
       repo: cloneStyleGAN2Repo.outputs.repo
-      extractedImagesForTraining:
-        type: dataset
-        with:
-          ref: getPretrainedModel.outputs.pretrainedNetwork
+      extractedImagesForTraining: getPretrainedModel.outputs.pretrainedNetwork
       ourTrainedNetwork: trainOurModel.outputs.ourTrainedNetwork
     outputs:
       evaluationOurs:
