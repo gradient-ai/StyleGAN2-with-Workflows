@@ -98,7 +98,7 @@ jobs:
       extractedImagesForTraining:
         type: dataset
         with:
-          ref: stylegan2-w1of2-extracted-images
+          ref: stylegan-w1of2-extracted-images
       pretrainedNetwork: getPretrainedModel.outputs.pretrainedNetwork
     outputs:
       evaluationPretrained:
