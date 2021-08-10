@@ -1,3 +1,9 @@
+on:
+  github:
+    branches:
+      only: main
+
+
 # StyleGAN2 Workflow 1 of 2: Download and extract data
 #
 # This is the YAML file used to run the Gradient download and extract data Workflow for the sample project based on
