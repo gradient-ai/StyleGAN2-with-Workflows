@@ -50,7 +50,7 @@ jobs:
       catImageDatabase:
         type: dataset
         with:
-          ref: stylegan-w1of2-cat-image-database
+          ref: demo-dataset
     uses: script@v1
     with:
       script: |-
@@ -101,7 +101,7 @@ jobs:
       extractedImages:
         type: dataset
         with:
-          ref: stylegan-w1of2-extracted-images
+          ref: demo-dataset
     uses: script@v1
     with:
       script: |-
