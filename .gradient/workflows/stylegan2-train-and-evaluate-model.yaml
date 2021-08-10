@@ -168,6 +168,7 @@ jobs:
     resources:
       instance-type: P6000 #V100
     needs:
+      - getPretrainedModel
       - cloneStyleGAN2Repo
     inputs:
       extractedImagesForTraining: getPretrainedModel.outputs.pretrainedNetwork
@@ -214,6 +215,7 @@ jobs:
       instance-type: P6000 #V100
     needs:
       - cloneStyleGAN2Repo
+      - getPretrainedModel
       - trainOurModel
     inputs:
       repo: cloneStyleGAN2Repo.outputs.repo
