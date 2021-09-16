@@ -16,17 +16,20 @@
 # Dataset IDs
 #
 # The user needs to create their own Gradient managed datasets for job outputs, using the same names as here.
-# See the project GitHub documentation for details on how to do this.
+# See the project documentation for details on how to do this.
 #
 # Job name               Gradient managed dataset name
 #
-# getCatImageDatabase -> stylegan2-workflows-sample-project-cat-img-db
-# extractImages       -> stylegan2-workflows-sample-project-extr-img
+# getCatImageDatabase -> stylegan2-wsp-cat-img-db
+# extractImages       -> stylegan2-wsp-extr-img
 #
-# Last updated: Sep 15th 2021
+# Last updated: Sep 16th 2021
 
-# Trigger Workflow to run on update to repository when linked to a Gradient project
+# Trigger Workflow to run on any update (commit) to the repository when linked to a Gradient project
 # (uncomment to activate)
+#
+# An example of a change is to change the number of images extracted in the --max_images=1000 argument to the
+# python dataset_tool.py create_lsun command in job 3 (extractImages) below
 
 #on:
 #  github:
@@ -52,7 +55,7 @@ jobs:
       catImageDatabase:
         type: dataset
         with:
-          ref: gradient/stylegan2-workflows-sample-project-cat-img-db # Use when this is working to update public dataset
+          ref: stylegan2-wsp-cat-img-db
     uses: script@v1
     with:
       script: |-
@@ -101,7 +104,7 @@ jobs:
       extractedImages:
         type: dataset
         with:
-          ref: gradient/stylegan2-workflows-sample-project-extr-img
+          ref: stylegan2-wsp-extr-img
     uses: script@v1
     with:
       script: |-
@@ -136,9 +139,10 @@ jobs:
   # Some other notes on what some steps above are doing and why
   #
   #  - The StyleGAN2 repo's download script is for the Flickr Faces Dataset, and
-  #    LSUN's download script is for their scene categories dataset, not object categories
+  #    LSUN's download script is for their scene categories dataset, but not object categories
   #  - The cat data under object categories has no download script, hence curl http://dl.yf.io/lsun/objects/cat.zip
   #  - getCatImageDatabase uses TensorFlow image because alpine:latest doesn't have bash, and bash:5 doesn't have curl
+  #  - This works, and other images could also be used
   #  - /cat_workspace is acting like a temporary volume (copy files to it then rm), which could be done more formally
   #  - pip install --upgrade pip helps the opencv install go considerably faster
   #  - lmdb, python-lmdb, and opencv are required for dataset_tool.py create_lsun

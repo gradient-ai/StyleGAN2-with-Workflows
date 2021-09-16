@@ -20,7 +20,7 @@
 # Dataset IDs
 #
 # The user needs to create their own Gradient managed datasets for job outputs, using the same names as here.
-# See the project GitHub documentation for details on how to do this.
+# See the project documentation for details on how to do this.
 #
 # Job name                         Gradient managed dataset name
 #
@@ -31,16 +31,19 @@
 # evaluateOurModel              -> stylegan2-wsp-evaluation-ours
 # generateImagesOurModel        -> stylegan2-wsp-generated-cats-ours
 #
-# The ID for the Gradient managed datasets should correspond to the IDs output from running the first workflow of the pair
-# in this project (stylegan2-download-and-extract-data.yaml).
+# The names for the Gradient managed datasets should correspond to the names output from running the first workflow of
+# the pair in this project (stylegan2-download-and-extract-data.yaml).
 #
 # We create different datasets for the output from each job because jobs can run in parallel and if their outputs were
 # put into the same dataset it would create clashing versions.
 #
-# Last updated: Sep 15th 2021
+# Last updated: Sep 16th 2021
 
-# Trigger Workflow to run on update to repository when linked to a Gradient project
+# Trigger Workflow to run on any update (commit) to the repository when linked to a Gradient project
 # (uncomment to activate)
+#
+# An example of a change is to change the random seeds for image generation in the --seeds=6600-6605 argument to the
+# python run_generator.py generate-images command in job 4 (generateImagesPretrainedModel) below
 
 #on:
 #  github:
@@ -86,10 +89,12 @@ jobs:
 
   # 3. Run evaluation on pretrained cat model
 
-  # The temporary workaround using gzip/split/cat/gunzip is visible here and in steps 5-7
   # The input extracted images dataset reference refers to the latest version from Workflow 1
   # A particular version of the input extracted images can also be specified, via <dataset ID>:<dataset version>
   # (Also available are no version (latest), v1 (etc.), :latest, or :<dataset-tag>)
+
+  # Comment the first "ref:" line and uncomment the second one under "inputs:" below if you ran Workflow 1 yourself and
+  # want to use its output rather than gradient/stylegan2-workflows-sample-project-extr-img, which is the public dataset
 
   evaluatePretrainedModel:
     resources:
@@ -103,6 +108,7 @@ jobs:
         type: dataset
         with:
           ref: gradient/stylegan2-workflows-sample-project-extr-img
+          #ref: stylegan2-wsp-extr-img
       pretrainedNetwork: getPretrainedModel.outputs.pretrainedNetwork
     outputs:
       evaluationPretrained:
@@ -163,6 +169,9 @@ jobs:
 
   # This could be extended to a larger image set by passing it in instead
 
+  # Comment the first "ref:" line and uncomment the second one under "inputs:" below if you ran Workflow 1 yourself and
+  # want to use its output rather than gradient/stylegan2-workflows-sample-project-extr-img, which is the public dataset
+
   trainOurModel:
     resources:
       instance-type: P4000 # Or P6000, V100
@@ -173,6 +182,7 @@ jobs:
         type: dataset
         with:
           ref: gradient/stylegan2-workflows-sample-project-extr-img
+          #ref: stylegan2-wsp-extr-img
       repo: cloneStyleGAN2Repo.outputs.repo
     outputs:
       ourTrainedNetwork:
@@ -202,6 +212,9 @@ jobs:
   # Note here we are evaluating on the same images as used for training
   # Since our model was only trained on a small subset it doesn't matter here
 
+  # Comment the first "ref:" line and uncomment the second one under "inputs:" below if you ran Workflow 1 yourself and
+  # want to use its output rather than gradient/stylegan2-workflows-sample-project-extr-img, which is the public dataset
+
   evaluateOurModel:
     resources:
       instance-type: P4000 # Or P6000, V100
@@ -214,6 +227,7 @@ jobs:
         type: dataset
         with:
           ref: gradient/stylegan2-workflows-sample-project-extr-img
+          #ref: stylegan2-wsp-extr-img
       ourTrainedNetwork: trainOurModel.outputs.ourTrainedNetwork
     outputs:
       evaluationOurs:
