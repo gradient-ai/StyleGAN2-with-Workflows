@@ -1,8 +1,3 @@
-on:
-  github:
-    branches:
-      only: main
-
 # StyleGAN2 Workflow 2 of 2: Train and evaluate model
 #
 # This is the YAML file used to run the Gradient modeling Workflow for the sample project based on StyleGAN2 at
@@ -10,7 +5,7 @@ on:
 #
 # See that URL for details on how to run the project.
 #
-# We assume the reader is familiar with the basics of workflows, and here wishes to use them for real projects.
+# We assume the reader is familiar with the basics of Workflows, and here wishes to use them for real projects.
 #
 # Steps performed by the Workflow
 #
@@ -24,24 +19,33 @@ on:
 #
 # Dataset IDs
 #
-# The user needs to create their own Gradient managed dataset for job outputs, using the same names as here.
+# The user needs to create their own Gradient managed datasets for job outputs, using the same names as here.
 # See the project GitHub documentation for details on how to do this.
 #
 # Job name                         Gradient managed dataset name
-# getPretrainedModel            -> stylegan2-w2of2-pretrained-network
-# evaluatePretrainedModel       -> stylegan2-w2of2-evaluation-pretrained
-# generateImagesPretrainedModel -> stylegan2-w2of2-generated-cats-pretrained
-# trainOurModel                 -> stylegan2-w2of2-our-trained-network
-# evaluateOurModel              -> stylegan2-w2of2-evaluation-ours
-# generateImagesOurModel        -> stylegan2-w2of2-generated-cats-ours
 #
-# The ID for the Gradient managed dataset should correspond to the ID output from running the first workflow of the pair
+# getPretrainedModel            -> stylegan2-wsp-pretrained-network
+# evaluatePretrainedModel       -> stylegan2-wsp-evaluation-pretrained
+# generateImagesPretrainedModel -> stylegan2-wsp-generated-cats-pretrained
+# trainOurModel                 -> stylegan2-wsp-our-trained-network
+# evaluateOurModel              -> stylegan2-wsp-evaluation-ours
+# generateImagesOurModel        -> stylegan2-wsp-generated-cats-ours
+#
+# The ID for the Gradient managed datasets should correspond to the IDs output from running the first workflow of the pair
 # in this project (stylegan2-download-and-extract-data.yaml).
 #
 # We create different datasets for the output from each job because jobs can run in parallel and if their outputs were
 # put into the same dataset it would create clashing versions.
 #
-# Last updated: Aug 08th 2021
+# Last updated: Sep 15th 2021
+
+# Trigger Workflow to run on update to repository when linked to a Gradient project
+# (uncomment to activate)
+
+#on:
+#  github:
+#    branches:
+#      only: main
 
 jobs:
 
@@ -49,7 +53,7 @@ jobs:
 
   cloneStyleGAN2Repo:
     resources:
-      instance-type: C5
+      instance-type: C3
     outputs:
       repo:
         type: volume
@@ -65,12 +69,12 @@ jobs:
 
   getPretrainedModel:
     resources:
-      instance-type: C5
+      instance-type: C3
     outputs:
       pretrainedNetwork:
         type: dataset
         with:
-          ref: stylegan2-w2of2-pretrained-network
+          ref: stylegan2-wsp-pretrained-network
     uses: container@v1
     with:
       args:
@@ -89,7 +93,7 @@ jobs:
 
   evaluatePretrainedModel:
     resources:
-      instance-type: P6000 #V100
+      instance-type: P4000 # P6000 or V100 will run this step faster if available, but cost more
     needs:
       - cloneStyleGAN2Repo
       - getPretrainedModel
@@ -98,13 +102,13 @@ jobs:
       extractedImagesForTraining:
         type: dataset
         with:
-          ref: stylegan-w1of2-extracted-images
+          ref: gradient/stylegan2-workflows-sample-project-extr-img
       pretrainedNetwork: getPretrainedModel.outputs.pretrainedNetwork
     outputs:
       evaluationPretrained:
         type: dataset
         with:
-          ref: stylegan2-w2of2-evaluation-pretrained
+          ref: stylegan2-wsp-evaluation-pretrained
     uses: script@v1
     with:
       script: |-
@@ -113,11 +117,6 @@ jobs:
         pip install Pillow==6.2.1
         cp -R /inputs/repo /stylegan2
         cp -R /inputs/extractedImagesForTraining/cat_images_tfrecords /stylegan2
-        cd /stylegan2/cat_images_tfrecords/cat
-        for res in 2 3 4 5 6 7 8; do \
-          cat cat_images_tfrecords-r0${res}_* > cat_images_tfrecords-r0$res.tfrecords.gz; \
-          gunzip cat_images_tfrecords-r0$res.tfrecords.gz; \
-        done
         cd /stylegan2
         python run_metrics.py \
           --data-dir=/stylegan2/cat_images_tfrecords \
@@ -143,7 +142,7 @@ jobs:
       generatedCatsPretrained:
         type: dataset
         with:
-          ref: stylegan2-w2of2-generated-cats-pretrained
+          ref: stylegan2-wsp-generated-cats-pretrained
     uses: script@v1
     with:
       script: |-
@@ -166,18 +165,20 @@ jobs:
 
   trainOurModel:
     resources:
-      instance-type: P6000 #V100
+      instance-type: P4000 # Or P6000, V100
     needs:
-      - getPretrainedModel
       - cloneStyleGAN2Repo
     inputs:
-      extractedImagesForTraining: getPretrainedModel.outputs.pretrainedNetwork
+      extractedImagesForTraining:
+        type: dataset
+        with:
+          ref: gradient/stylegan2-workflows-sample-project-extr-img
       repo: cloneStyleGAN2Repo.outputs.repo
     outputs:
       ourTrainedNetwork:
         type: dataset
         with:
-          ref: stylegan2-w2of2-our-trained-network
+          ref: stylegan2-wsp-our-trained-network
     uses: script@v1
     with:
       script: |-
@@ -186,11 +187,6 @@ jobs:
         pip install Pillow==6.2.1
         cp -R /inputs/repo /stylegan2
         cp -R /inputs/extractedImagesForTraining/cat_images_tfrecords /stylegan2
-        cd /stylegan2/cat_images_tfrecords/cat
-        for res in 2 3 4 5 6 7 8; do \
-          cat cat_images_tfrecords-r0${res}_* > cat_images_tfrecords-r0$res.tfrecords.gz; \
-          gunzip cat_images_tfrecords-r0$res.tfrecords.gz; \
-        done
         cd /stylegan2
         python run_training.py \
           --data-dir=/stylegan2/cat_images_tfrecords \
@@ -198,10 +194,6 @@ jobs:
           --dataset=cat \
           --total-kimg=10 \
           --result-dir=/outputs/ourTrainedNetwork
-        cd /outputs/ourTrainedNetwork/00000-stylegan2-cat-1gpu-config-f
-        gzip network-final.pkl
-        split -a 3 -b 100m network-final.pkl.gz network-final_
-        rm network-final.pkl.gz network-snapshot-*
         ls "-aFlR" /outputs
       image: tensorflow/tensorflow:1.14.0-gpu-py3
 
@@ -212,20 +204,22 @@ jobs:
 
   evaluateOurModel:
     resources:
-      instance-type: P6000 #V100
+      instance-type: P4000 # Or P6000, V100
     needs:
       - cloneStyleGAN2Repo
-      - getPretrainedModel
       - trainOurModel
     inputs:
       repo: cloneStyleGAN2Repo.outputs.repo
-      extractedImagesForTraining: getPretrainedModel.outputs.pretrainedNetwork
+      extractedImagesForTraining:
+        type: dataset
+        with:
+          ref: gradient/stylegan2-workflows-sample-project-extr-img
       ourTrainedNetwork: trainOurModel.outputs.ourTrainedNetwork
     outputs:
       evaluationOurs:
         type: dataset
         with:
-          ref: stylegan2-w2of2-evaluation-ours
+          ref: stylegan2-wsp-evaluation-ours
     uses: script@v1
     with:
       script: |-
@@ -234,19 +228,11 @@ jobs:
         pip install Pillow==6.2.1
         cp -R /inputs/repo /stylegan2
         cp -R /inputs/extractedImagesForTraining/cat_images_tfrecords /stylegan2
-        cd /stylegan2/cat_images_tfrecords/cat
-        for res in 2 3 4 5 6 7 8; do \
-          cat cat_images_tfrecords-r0${res}_* > cat_images_tfrecords-r0$res.tfrecords.gz; \
-          gunzip cat_images_tfrecords-r0$res.tfrecords.gz; \
-        done
-        mkdir /ourTrainedNetwork
-        cd /ourTrainedNetwork
-        cat /inputs/ourTrainedNetwork/00000-stylegan2-cat-1gpu-config-f/network-final_* > network-final.pkl.gz
-        gunzip network-final.pkl.gz
+        cp    /inputs/ourTrainedNetwork/00000-stylegan2-cat-1gpu-config-f/network-final.pkl /stylegan2
         cd /stylegan2
         python run_metrics.py \
           --data-dir=/stylegan2/cat_images_tfrecords \
-          --network=/ourTrainedNetwork/network-final.pkl \
+          --network=/stylegan2/network-final.pkl \
           --metrics=fid50k,ppl2_wend \
           --dataset=cat \
           --result-dir=/outputs/evaluationOurs
@@ -268,7 +254,7 @@ jobs:
       generatedCatsOurs:
         type: dataset
         with:
-          ref: stylegan2-w2of2-generated-cats-ours
+          ref: stylegan2-wsp-generated-cats-ours
     uses: script@v1
     with:
       script: |-
@@ -276,13 +262,10 @@ jobs:
         pip install requests==2.22.0
         pip install Pillow==6.2.1
         cp -R /inputs/repo /stylegan2
-        mkdir /ourTrainedNetwork
-        cd /ourTrainedNetwork
-        cat /inputs/ourTrainedNetwork/00000-stylegan2-cat-1gpu-config-f/network-final_* > network-final.pkl.gz
-        gunzip network-final.pkl.gz
+        cp    /inputs/ourTrainedNetwork/00000-stylegan2-cat-1gpu-config-f/network-final.pkl /stylegan2
         cd /stylegan2
         python run_generator.py generate-images \
-          --network=/ourTrainedNetwork/network-final.pkl \
+          --network=/stylegan2/network-final.pkl \
           --seeds=6600-6605 \
           --truncation-psi=0.5 \
           --result-dir=/outputs/generatedCatsOurs
