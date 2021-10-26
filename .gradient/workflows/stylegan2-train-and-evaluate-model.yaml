@@ -45,10 +45,10 @@
 # An example of a change is to change the random seeds for image generation in the --seeds=6600-6605 argument to the
 # python run_generator.py generate-images command in job 4 (generateImagesPretrainedModel) below
 
-#on:
-#  github:
-#    branches:
-#      only: main
+on:
+ github:
+   branches:
+     only: main
 
 jobs:
 
