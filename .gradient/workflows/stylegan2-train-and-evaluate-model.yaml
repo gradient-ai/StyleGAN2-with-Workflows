@@ -37,7 +37,7 @@
 # We create different datasets for the output from each job because jobs can run in parallel and if their outputs were
 # put into the same dataset it would create clashing versions.
 #
-# Last updated: Sep 16th 2021
+# Last updated: Nov 03rd 2021
 
 # Trigger Workflow to run on any update (commit) to the repository when linked to a Gradient project
 # (uncomment to activate)
@@ -56,7 +56,7 @@ jobs:
 
   cloneStyleGAN2Repo:
     resources:
-      instance-type: C3
+      instance-type: C4
     outputs:
       repo:
         type: volume
@@ -72,7 +72,7 @@ jobs:
 
   getPretrainedModel:
     resources:
-      instance-type: C3
+      instance-type: C4
     outputs:
       pretrainedNetwork:
         type: dataset
