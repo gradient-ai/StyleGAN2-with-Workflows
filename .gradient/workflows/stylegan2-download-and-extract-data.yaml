@@ -23,7 +23,7 @@
 # getCatImageDatabase -> stylegan2-wsp-cat-img-db
 # extractImages       -> stylegan2-wsp-extr-img
 #
-# Last updated: Sep 16th 2021
+# Last updated: Nov 03rd 2021
 
 # Trigger Workflow to run on any update (commit) to the repository when linked to a Gradient project
 # (uncomment to activate)
@@ -36,11 +36,11 @@
 #    branches:
 #      only: main
 
-# Our download and extract steps do not require a GPU, so we default to a C3 machine for all steps
+# Our download and extract steps do not require a GPU, so we default to a C4 machine for all steps
 
 defaults:
   resources:
-    instance-type: C3 # C5 will run these steps faster if available, but costs more
+    instance-type: C4 # C5 will run these steps faster if available, but costs more
 
 jobs:
 
